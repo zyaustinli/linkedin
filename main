@@ -1,0 +1,82 @@
+from selenium import webdriver
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
+
+
+url = "https://www.linkedin.com/jobs/search/?currentJobId=3544515271&f_AL=true&geoId=101784816&keywords=data%20scientist&location=San%20Diego%2C%20CA&refresh=true"
+chrome_options = webdriver.ChromeOptions()
+driver = webdriver.Chrome(options = chrome_options)
+driver.get(url)
+
+
+email = "zyaustinli@gmail.com"
+password = "Ilanimef100y!"
+phone = 8582848339
+
+sign_in = driver.find_element(By.CSS_SELECTOR, ".btn-secondary-emphasis")
+sign_in.click()
+time.sleep(5)
+
+
+email_field = driver.find_element(by="id", value="username")
+email_field.send_keys(email)
+password_field = driver.find_element(by="id", value="password")
+password_field.send_keys(password)
+sign_in_button = driver.find_element(by="xpath", value="//*[@id='organic-div']/form/div[3]/button")
+sign_in_button.click()
+
+time.sleep(10)
+
+all_listings = driver.find_elements(by=By.CSS_SELECTOR, value=".job-card-container__link")
+
+for listing in all_listings:
+    listing.click()
+    time.sleep(2)
+
+    try:
+        apply = driver.find_element(by=By.CSS_SELECTOR, value=".jobs-s-apply button")
+        apply.click()
+
+        phone = driver.find_element(by=By.XPATH, value="input[id*=phoneNumber]")
+        if phone.text == "":
+            phone.send_keys(phone)
+
+        submit_button = driver.find_element(by=By.CSS_SELECTOR, value="footer button")
+        if submit_button.get_attribute("data-control-name") == "continue_unify":
+            close_button = driver.find_element(by=By.CLASS_NAME, value="artdeco-modal__dismiss")
+            close_button.click()
+
+            time.sleep(2)
+            discard_button = driver.find_elements(by=By.CLASS_NAME, value="artdeco-modal__confirm-dialog-btn")[1]
+            discard_button.click()
+            print("Complex application, skipped.")
+            continue
+        else:
+            # Click Submit Button
+            print("Submitting job application")
+            submit_button.click()
+
+        time.sleep(2)
+        # Click Close Button
+        close_button = driver.find_element(by=By.CLASS_NAME, value="artdeco-modal__dismiss")
+        close_button.click()
+
+    except NoSuchElementException:
+        close_button = driver.find_element(by=By.CLASS_NAME, value="artdeco-modal__dismiss")
+        close_button.click()
+
+        time.sleep(2)
+    # Click Discard Button
+        discard_button = driver.find_elements(by=By.CLASS_NAME, value="artdeco-modal__confirm-dialog-btn")[1]
+        discard_button.click()
+        print("No application button, skipped.")
+        continue
+
+time.sleep(5)
+driver.quit()
+    
+
+
+
